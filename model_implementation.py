@@ -255,12 +255,12 @@ class SimplePlantDiseaseClassifier:
         print(f"Overall Accuracy: {report['accuracy']:.3f}")
         print(f"Macro Avg F1:     {report['macro avg']['f1-score']:.3f}")
 
-    def save_model(self, model_path="plant_disease_model.h5", save_weights_only=False):
+    def save_model(self, model_path="plant_disease_model.keras", save_weights_only=False):
         """Save the trained model"""
         try:
             if save_weights_only:
-                self.model.save_weights(model_path.replace('.h5', '_weights.h5'))
-                print(f"💾 Model weights saved to: {model_path.replace('.h5', '_weights.h5')}")
+                self.model.save_weights(model_path.replace('.keras', '_weights.weights.h5'))
+                print(f"💾 Model weights saved to: {model_path.replace('.keras', '_weights.weights.h5')}")
             else:
                 self.model.save(model_path)
                 print(f"💾 Complete model saved to: {model_path}")
@@ -274,7 +274,7 @@ class SimplePlantDiseaseClassifier:
                 'test_accuracy': getattr(self, 'test_accuracy', None)
             }
 
-            info_path = model_path.replace('.h5', '_info.json')
+            info_path = model_path.replace('.keras', '_info.json')
             with open(info_path, 'w') as f:
                 json.dump(model_info, f, indent=2)
             print(f"📋 Model info saved to: {info_path}")
@@ -284,14 +284,14 @@ class SimplePlantDiseaseClassifier:
             print(f"❌ Error saving model: {e}")
             return False
 
-    def load_saved_model(self, model_path="plant_disease_model.h5"):
+    def load_saved_model(self, model_path="plant_disease_model.keras"):
         """Load a previously saved model"""
         try:
             self.model = tf.keras.models.load_model(model_path)
             print(f"✅ Model loaded from: {model_path}")
 
             # Load model info if available
-            info_path = model_path.replace('.h5', '_info.json')
+            info_path = model_path.replace('.keras', '_info.json')
             if Path(info_path).exists():
                 import json
                 with open(info_path, 'r') as f:
@@ -373,7 +373,7 @@ def main():
     # ACTUALLY SAVE THE MODEL HERE!
     print("\n💾 Saving trained model...")
     classifier.test_accuracy = test_accuracy
-    classifier.save_model("plant_disease_model.h5")
+    classifier.save_model("plant_disease_model.keras")
 
     # Agricultural impact
     print("\n🌾 Agricultural Impact Assessment:")
@@ -391,7 +391,7 @@ def main():
 
     print(f"\n🎉 Plant Disease Classification Completed!")
     print(f"Final Performance: {test_accuracy * 100:.2f}% accuracy")
-    print(f"💾 Model saved to: plant_disease_model.h5")
+    print(f"💾 Model saved to: plant_disease_model.keras")
 
 
 if __name__ == "__main__":

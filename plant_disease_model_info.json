@@ -1,0 +1,10 @@
+{
+  "class_names": [
+    "Healthy",
+    "Powdery",
+    "Rust"
+  ],
+  "img_height": 224,
+  "img_width": 224,
+  "test_accuracy": 0.9791666666666666
+}
