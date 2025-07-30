@@ -255,7 +255,54 @@ class SimplePlantDiseaseClassifier:
         print(f"Overall Accuracy: {report['accuracy']:.3f}")
         print(f"Macro Avg F1:     {report['macro avg']['f1-score']:.3f}")
 
-        return report
+    def save_model(self, model_path="plant_disease_model.h5", save_weights_only=False):
+        """Save the trained model"""
+        try:
+            if save_weights_only:
+                self.model.save_weights(model_path.replace('.h5', '_weights.h5'))
+                print(f"💾 Model weights saved to: {model_path.replace('.h5', '_weights.h5')}")
+            else:
+                self.model.save(model_path)
+                print(f"💾 Complete model saved to: {model_path}")
+
+            # Also save model information
+            import json
+            model_info = {
+                'class_names': self.class_names,
+                'img_height': self.img_height,
+                'img_width': self.img_width,
+                'test_accuracy': getattr(self, 'test_accuracy', None)
+            }
+
+            info_path = model_path.replace('.h5', '_info.json')
+            with open(info_path, 'w') as f:
+                json.dump(model_info, f, indent=2)
+            print(f"📋 Model info saved to: {info_path}")
+
+            return True
+        except Exception as e:
+            print(f"❌ Error saving model: {e}")
+            return False
+
+    def load_saved_model(self, model_path="plant_disease_model.h5"):
+        """Load a previously saved model"""
+        try:
+            self.model = tf.keras.models.load_model(model_path)
+            print(f"✅ Model loaded from: {model_path}")
+
+            # Load model info if available
+            info_path = model_path.replace('.h5', '_info.json')
+            if Path(info_path).exists():
+                import json
+                with open(info_path, 'r') as f:
+                    model_info = json.load(f)
+                self.class_names = model_info.get('class_names', self.class_names)
+                print(f"📋 Model info loaded: {len(self.class_names)} classes")
+
+            return True
+        except Exception as e:
+            print(f"❌ Error loading model: {e}")
+            return False
 
 
 def main():
@@ -323,6 +370,11 @@ def main():
     # Classification report
     report = classifier.generate_classification_report(true_labels, predicted_classes)
 
+    # ACTUALLY SAVE THE MODEL HERE!
+    print("\n💾 Saving trained model...")
+    classifier.test_accuracy = test_accuracy
+    classifier.save_model("plant_disease_model.h5")
+
     # Agricultural impact
     print("\n🌾 Agricultural Impact Assessment:")
     print("-" * 40)
@@ -339,6 +391,7 @@ def main():
 
     print(f"\n🎉 Plant Disease Classification Completed!")
     print(f"Final Performance: {test_accuracy * 100:.2f}% accuracy")
+    print(f"💾 Model saved to: plant_disease_model.h5")
 
 
 if __name__ == "__main__":
